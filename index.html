@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GNIST Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080808;
+      --surface: #101010;
+      --border: #1c1c1c;
+      --border-hover: #2a2a2a;
+      --text: #ddd8cf;
+      --text-muted: #444;
+      --text-dim: #2a2a2a;
+      --gold: #c4a35a;
+      --gold-light: #d4b46a;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-flame { font-size: 16px; }
+
+    .brand-name {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .phase-indicator {
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      display: none;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 4px 0;
+      display: none;
+      transition: color 0.15s;
+    }
+
+    .back-btn:hover { color: var(--text); }
+
+    /* LANDING */
+    #landing {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .landing-inner {
+      max-width: 480px;
+      width: 100%;
+    }
+
+    .landing-eyebrow {
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+
+    .landing-title {
+      font-family: 'Fraunces', serif;
+      font-size: 38px;
+      font-weight: 300;
+      color: var(--text);
+      margin-bottom: 48px;
+      line-height: 1.15;
+      font-style: italic;
+    }
+
+    .phase-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .phase-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 20px 24px;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      align-items: center;
+      gap: 16px;
+      text-align: left;
+      font-family: inherit;
+      color: var(--text);
+      transition: border-color 0.15s, background 0.15s;
+      width: 100%;
+    }
+
+    .phase-btn:hover {
+      border-color: var(--border-hover);
+      background: #141414;
+    }
+
+    .phase-btn:hover .phase-btn-icon { color: var(--gold-light); }
+
+    .phase-btn-icon {
+      font-size: 16px;
+      color: var(--gold);
+      text-align: center;
+      transition: color 0.15s;
+    }
+
+    .phase-btn-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      font-weight: 500;
+    }
+
+    .phase-btn-desc {
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* CHAT */
+    #chat {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      max-width: 640px;
+      width: 100%;
+      margin: 0 auto;
+      min-height: 0;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-behavior: smooth;
+    }
+
+    .messages::-webkit-scrollbar { width: 3px; }
+    .messages::-webkit-scrollbar-thumb { background: #1e1e1e; border-radius: 2px; }
+
+    .msg {
+      display: flex;
+      animation: msgIn 0.2s ease;
+    }
+
+    .msg.user { justify-content: flex-end; }
+    .msg.assistant { justify-content: flex-start; }
+
+    .bubble {
+      max-width: 80%;
+      padding: 13px 17px;
+      border-radius: 3px;
+      font-size: 13.5px;
+      line-height: 1.7;
+      letter-spacing: 0.015em;
+    }
+
+    .msg.assistant .bubble {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .msg.user .bubble {
+      background: #151515;
+      border: 1px solid #222;
+      color: var(--gold);
+    }
+
+    /* TYPING INDICATOR */
+    .typing {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      padding: 16px 18px;
+    }
+
+    .dot {
+      width: 4px;
+      height: 4px;
+      background: #333;
+      border-radius: 50%;
+      animation: dotPulse 1.3s ease infinite;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.15s; }
+    .dot:nth-child(3) { animation-delay: 0.3s; }
+
+    /* INPUT */
+    .input-area {
+      display: flex;
+      gap: 10px;
+      padding: 14px 24px 20px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      align-items: flex-end;
+    }
+
+    textarea {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      letter-spacing: 0.02em;
+      padding: 11px 15px;
+      resize: none;
+      line-height: 1.6;
+      outline: none;
+      min-height: 42px;
+      max-height: 120px;
+      overflow-y: auto;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus { border-color: #2a2a2a; }
+    textarea::placeholder { color: var(--text-dim); }
+
+    .send {
+      background: var(--gold);
+      border: none;
+      border-radius: 3px;
+      color: #080808;
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, opacity 0.15s;
+      font-family: inherit;
+    }
+
+    .send:hover:not(:disabled) { background: var(--gold-light); }
+    .send:disabled { opacity: 0.25; cursor: default; }
+
+    /* DIVIDER */
+    .session-divider {
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      padding: 4px 0 8px;
+      text-transform: uppercase;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes dotPulse {
+      0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
+      40% { opacity: 1; transform: scale(1.1); }
+    }
+
+    /* MOBILE */
+    @media (max-width: 480px) {
+      .landing-title { font-size: 30px; }
+      .phase-btn-desc { display: none; }
+      .bubble { max-width: 90%; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="brand">
+      <span class="brand-flame">🔥</span>
+      <span class="brand-name">GNIST</span>
+    </div>
+    <div class="header-right">
+      <span class="phase-indicator" id="phaseIndicator"></span>
+      <button class="back-btn" id="backBtn" onclick="goBack()">← Bytt fase</button>
+    </div>
+  </header>
+
+  <!-- LANDING -->
+  <div id="landing">
+    <div class="landing-inner">
+      <p class="landing-eyebrow">Beslutningsstøtte for trenere</p>
+      <h1 class="landing-title">Hvor er du nå?</h1>
+      <div class="phase-list">
+        <button class="phase-btn" onclick="startPhase('before', 'FØR KAMP')">
+          <span class="phase-btn-icon">◎</span>
+          <span class="phase-btn-label">FØR KAMP</span>
+          <span class="phase-btn-desc">Forberedelse og retning</span>
+        </button>
+        <button class="phase-btn" onclick="startPhase('during', 'UNDER KAMP')">
+          <span class="phase-btn-icon">●</span>
+          <span class="phase-btn-label">UNDER KAMP</span>
+          <span class="phase-btn-desc">Regulering og justering</span>
+        </button>
+        <button class="phase-btn" onclick="startPhase('after', 'ETTER KAMP')">
+          <span class="phase-btn-icon">○</span>
+          <span class="phase-btn-label">ETTER KAMP</span>
+          <span class="phase-btn-desc">Reset og evaluering</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chat">
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <textarea
+        id="input"
+        placeholder="Skriv her..."
+        rows="1"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"
+      ></textarea>
+      <button class="send" id="sendBtn" onclick="send()" disabled>→</button>
+    </div>
+  </div>
+
+  <script>
+    let currentPhase = null;
+    let history = [];
+    let loading = false;
+
+    const openers = {
+      before: "Hva er det viktigste du vil ha på plass før kampen i dag?",
+      during: "Hva skjer nå?",
+      after: "Hvordan sitter det?",
+    };
+
+    function startPhase(phase, label) {
+      currentPhase = phase;
+      history = [];
+
+      document.getElementById('landing').style.display = 'none';
+      const chat = document.getElementById('chat');
+      chat.style.display = 'flex';
+      document.getElementById('phaseIndicator').textContent = label;
+      document.getElementById('phaseIndicator').style.display = 'block';
+      document.getElementById('backBtn').style.display = 'block';
+
+      const msgs = document.getElementById('messages');
+      msgs.innerHTML = '';
+
+      const opener = openers[phase];
+      history.push({ role: 'assistant', content: opener });
+      appendMessage('assistant', opener);
+
+      setTimeout(() => {
+        document.getElementById('input').focus();
+        updateSendBtn();
+      }, 100);
+    }
+
+    function goBack() {
+      currentPhase = null;
+      history = [];
+      document.getElementById('chat').style.display = 'none';
+      document.getElementById('landing').style.display = 'flex';
+      document.getElementById('phaseIndicator').style.display = 'none';
+      document.getElementById('backBtn').style.display = 'none';
+      document.getElementById('input').value = '';
+      updateSendBtn();
+    }
+
+    function appendMessage(role, text) {
+      const msgs = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = `msg ${role}`;
+      div.innerHTML = `<div class="bubble">${text.replace(/\n/g, '<br>')}</div>`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function appendTyping() {
+      const msgs = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = 'msg assistant';
+      div.id = 'typing';
+      div.innerHTML = `<div class="bubble typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function removeTyping() {
+      const t = document.getElementById('typing');
+      if (t) t.remove();
+    }
+
+    async function send() {
+      const input = document.getElementById('input');
+      const text = input.value.trim();
+      if (!text || loading) return;
+
+      input.value = '';
+      autoResize(input);
+      updateSendBtn();
+
+      history.push({ role: 'user', content: text });
+      appendMessage('user', text);
+
+      loading = true;
+      appendTyping();
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: history, phase: currentPhase }),
+        });
+        const data = await res.json();
+        removeTyping();
+        const reply = data.text || 'Noe gikk galt. Prøv igjen.';
+        history.push({ role: 'assistant', content: reply });
+        appendMessage('assistant', reply);
+      } catch {
+        removeTyping();
+        appendMessage('assistant', 'Noe gikk galt. Prøv igjen.');
+      }
+
+      loading = false;
+      input.focus();
+      updateSendBtn();
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        send();
+      }
+    }
+
+    function autoResize(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+      updateSendBtn();
+    }
+
+    function updateSendBtn() {
+      const input = document.getElementById('input');
+      const btn = document.getElementById('sendBtn');
+      btn.disabled = !input.value.trim() || loading;
+    }
+
+    document.getElementById('input').addEventListener('input', updateSendBtn);
+  </script>
+</body>
+</html>
