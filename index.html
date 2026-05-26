@@ -10,15 +10,15 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #080808;
-      --surface: #101010;
-      --border: #1c1c1c;
-      --border-hover: #2a2a2a;
-      --text: #ddd8cf;
-      --text-muted: #444;
-      --text-dim: #2a2a2a;
-      --gold: #c4a35a;
-      --gold-light: #d4b46a;
+      --bg: #f7f5f2;
+      --surface: #ffffff;
+      --border: #e0dbd4;
+      --border-hover: #c8c0b4;
+      --text: #1a1814;
+      --text-muted: #8a8078;
+      --text-dim: #c0b8b0;
+      --gold: #9a6e2e;
+      --gold-light: #b07e38;
     }
 
     html, body {
@@ -70,7 +70,7 @@
     .phase-indicator {
       font-size: 9px;
       letter-spacing: 0.25em;
-      color: var(--gold);
+      color: var(--gold-light);
       display: none;
     }
 
@@ -147,14 +147,14 @@
 
     .phase-btn:hover {
       border-color: var(--border-hover);
-      background: #141414;
+      background: #f0ede8;
     }
 
     .phase-btn:hover .phase-btn-icon { color: var(--gold-light); }
 
     .phase-btn-icon {
       font-size: 16px;
-      color: var(--gold);
+      color: var(--gold-light);
       text-align: center;
       transition: color 0.15s;
     }
@@ -193,7 +193,7 @@
     }
 
     .messages::-webkit-scrollbar { width: 3px; }
-    .messages::-webkit-scrollbar-thumb { background: #1e1e1e; border-radius: 2px; }
+    .messages::-webkit-scrollbar-thumb { background: #d0c8c0; border-radius: 2px; }
 
     .msg {
       display: flex;
@@ -219,9 +219,9 @@
     }
 
     .msg.user .bubble {
-      background: #151515;
-      border: 1px solid #222;
-      color: var(--gold);
+      background: #f0ede8;
+      border: 1px solid #ddd8d0;
+      color: var(--gold-light);
     }
 
     /* TYPING INDICATOR */
@@ -235,7 +235,7 @@
     .dot {
       width: 4px;
       height: 4px;
-      background: #333;
+      background: #c0b8b0;
       border-radius: 50%;
       animation: dotPulse 1.3s ease infinite;
     }
@@ -272,14 +272,14 @@
       transition: border-color 0.15s;
     }
 
-    textarea:focus { border-color: #2a2a2a; }
+    textarea:focus { border-color: #9a6e2e; }
     textarea::placeholder { color: var(--text-dim); }
 
     .send {
       background: var(--gold);
       border: none;
       border-radius: 3px;
-      color: #080808;
+      color: #ffffff;
       width: 42px;
       height: 42px;
       cursor: pointer;
