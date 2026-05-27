@@ -5,6 +5,16 @@ export default async function handler(req, res) {
 
   const { messages, phase } = req.body;
 
+  // Logging
+  const isFirstMessage = messages.length === 1;
+  if (isFirstMessage) {
+    console.log(JSON.stringify({
+      event: 'session_start',
+      phase: phase || 'unknown',
+      timestamp: new Date().toISOString(),
+    }));
+  }
+
   const phaseContext = {
     before: "Treneren er i forberedelse før kamp. Fokus: retning, prioritering, klargjøring.",
     during: "Treneren er i aktiv kamp. Vær ekstra konsis. Kun det som hjelper nå.",
